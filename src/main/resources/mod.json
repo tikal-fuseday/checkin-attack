@@ -1,0 +1,6 @@
+{
+
+  "main":"com.tikal.fuseday.checkinattack.CheckinAttackVerticle",
+
+  "auto-redeploy": true
+}
