@@ -2,6 +2,7 @@
 package com.tikal.fuseday.checkinattack;
 
 import static java.util.stream.Collectors.toList;
+import io.vertx.java.redis.RedisClient;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpServer;
@@ -33,12 +36,28 @@ public class CheckinAttackVerticle extends Verticle {
 	
 	private final Map<String, List<Long>> attackers = new HashMap<>(); 
 	
-	private final Map<String, Integer> checkinsCounters = new HashMap<>();  
+	private final Map<String, Integer> checkinsCounters = new HashMap<>();
+	
+	private  RedisClient redisClient; 
 
 	@Override
 	public void start() {
 		config = container.config();
-		log = container.logger();		
+		log = container.logger();	
+		
+		
+		redisClient = new RedisClient(vertx.eventBus(), "io.vertx.mod-redis");
+		
+		redisClient.deployModule(container, config.getString("redis-host"), 6379, "UTF-8", false, null, 1, 1, new AsyncResultHandler<String>() {
+            @Override
+            public void handle(final AsyncResult<String> event) {
+                if (event.failed()) {
+                    log.error(event.cause().getMessage());
+                } else {
+                	log.info("connected to Redis");
+                }
+            }
+        });		
 		
 		config.getArray("attackers").forEach(this::registerAttacker);				
 		registerCheckinServer();		
@@ -110,6 +129,10 @@ public class CheckinAttackVerticle extends Verticle {
 		else
 			checkinsCounters.put(key, ++counter);
 		log.info("Finished hadling checkin : "+checkin);
+		
+		final String userId = checkin.getString("userId");
+		redisClient.lpush(userId,key);
+
 	}
 	
 	private boolean isUnlegal(final int number){

@@ -39,4 +39,6 @@
 .idea
 *.sublime-*
 .nb-gradle
+/mods
+dump.rdb
 .~*

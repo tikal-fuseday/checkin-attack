@@ -44,6 +44,7 @@ install - install any jars produced to the local Maven repository (.m2)
 
 dependencies {
 	compile "commons-io:commons-io:2.4"
+	compile "io.vertx:mod-redis-client:1.1.4"
   /*
   Add your module jar dependencies here
   E.g.
