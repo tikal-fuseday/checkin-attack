@@ -1,9 +1,9 @@
 {
-  "redis-host": "192.168.1.25",
-  "host": "192.168.1.25",
-  "port": 8080,
+  "redis-host": "localhost",
+  "host": "localhost",
+  
   
   "attackers":[
-  	{"instances":3,"delay":1000,"host": "192.168.1.25","port": 8080}   
+  	{"instances":1000,"delay":1,"host": "localhost","port": 8080}   
   ]
 }

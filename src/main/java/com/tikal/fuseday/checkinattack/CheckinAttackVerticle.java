@@ -77,10 +77,10 @@ public class CheckinAttackVerticle extends Verticle {
 	}	
 	
 	private void attack(final HttpClient client) {
-		log.info("Attacking...");
+//		log.info("Attacking...");
 		client.post("/checkin", r->log.info("Got a response: " + r.statusCode()))
 		.putHeader("Content-Type", "application/json")
-		.end(String.format(checkinTemplate,UUID.randomUUID(),-180*random.nextFloat(),180*random.nextFloat()));
+		.end(String.format(checkinTemplate,UUID.randomUUID(),180*random.nextFloat()-90,180*random.nextFloat()-90));
 	}
 	
 	
@@ -116,7 +116,7 @@ public class CheckinAttackVerticle extends Verticle {
 	
 
 	private void handleCheckin(final Buffer body) {
-		log.info("Hadling checking : "+body+"...");
+//		log.info("Hadling checking : "+body+"...");
 		final JsonObject checkin = new JsonObject(body.getString(0, body.length()));
 		final int lat = getGeoCord(checkin.getNumber("latitude"), 180);
 		final int lon = getGeoCord(checkin.getNumber("longitude"), 180);
@@ -128,11 +128,11 @@ public class CheckinAttackVerticle extends Verticle {
 			checkinsCounters.put(key, 1);
 		else
 			checkinsCounters.put(key, ++counter);
-		log.info("Finished hadling checkin : "+checkin);
+		
 		
 		final String userId = checkin.getString("userId");
 		redisClient.lpush(userId,key);
-
+		log.info("Finished hadling checkin : "+checkin);
 	}
 	
 	private boolean isUnlegal(final int number){
